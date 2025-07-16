@@ -182,18 +182,6 @@ export default function AdminDashboard() {
       return
     }
 
-    // 🔥 강제 업로드 모드가 아니고 Storage가 준비되지 않았다면 경고
-    // if (!forceUploadMode && storageStatus && !storageStatus.isReady) {
-    //   const proceed = confirm(
-    //     `⚠️ Storage 상태가 준비되지 않았습니다.\n\n` +
-    //       `오류: ${storageStatus.error}\n\n` +
-    //       `그래도 업로드를 시도하시겠습니까?\n` +
-    //       `(실패할 수 있지만 버킷이 실제로 존재한다면 성공할 수도 있습니다)`,
-    //   )
-
-    //   if (!proceed) return
-    // }
-
     setIsUploading(true)
     setUploadProgress("이미지 업로드 중...")
 
@@ -303,6 +291,7 @@ export default function AdminDashboard() {
     alert("개인정보 제3자 제공 약관이 업데이트되었습니다.")
   }
 
+  // 🔐 PIN 변경 처리 (수정됨)
   const handleChangePin = () => {
     if (newPin.length !== 4) {
       alert("PIN은 4자리여야 합니다.")
@@ -312,10 +301,29 @@ export default function AdminDashboard() {
       alert("PIN 확인이 일치하지 않습니다.")
       return
     }
-    adminStore.changePin(newPin)
-    setNewPin("")
-    setConfirmPin("")
-    alert("PIN이 성공적으로 변경되었습니다.")
+
+    try {
+      // 현재 PIN 확인
+      const currentPin = adminStore.getCurrentPin()
+      console.log("🔄 PIN 변경 시도:", { current: currentPin, new: newPin })
+
+      // PIN 변경
+      adminStore.changePin(newPin)
+
+      // 변경 후 확인
+      const updatedPin = adminStore.getCurrentPin()
+      console.log("✅ PIN 변경 후 확인:", updatedPin)
+
+      // 입력 필드 초기화
+      setNewPin("")
+      setConfirmPin("")
+
+      // 성공 메시지
+      alert(`PIN이 성공적으로 변경되었습니다.\n새 PIN: ${newPin}\n\n로그아웃하지 않고 계속 사용하실 수 있습니다.`)
+    } catch (error) {
+      console.error("❌ PIN 변경 오류:", error)
+      alert("PIN 변경 중 오류가 발생했습니다.")
+    }
   }
 
   const exportCustomerData = () => {
@@ -652,6 +660,13 @@ export default function AdminDashboard() {
                 <div className="border rounded-lg p-4">
                   <h3 className="font-semibold mb-4">PIN 번호 변경</h3>
                   <div className="space-y-4 max-w-md">
+                    <div className="p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
+                      <div className="font-medium mb-1">💡 PIN 변경 안내</div>
+                      <div>• PIN 변경 후 로그아웃되지 않습니다</div>
+                      <div>• 새 PIN은 즉시 적용됩니다</div>
+                      <div>• 현재 PIN: {adminStore.getCurrentPin()}</div>
+                    </div>
+
                     <div>
                       <Label htmlFor="newPin">새 PIN 번호 (4자리)</Label>
                       <Input

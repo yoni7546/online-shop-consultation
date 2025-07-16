@@ -12,7 +12,7 @@ export interface ConsultationStatus {
 
 class AdminStore {
   private static instance: AdminStore
-  private pin = "1234"
+  private defaultPin = "1234"
 
   private privacyPolicy = `개인정보 수집 및 이용에 관한 동의
 
@@ -33,6 +33,41 @@ class AdminStore {
       AdminStore.instance = new AdminStore()
     }
     return AdminStore.instance
+  }
+
+  // 🔐 PIN 관리 (localStorage 사용)
+  private getPinFromStorage(): string {
+    if (typeof window === "undefined") return this.defaultPin
+
+    const storedPin = localStorage.getItem("admin_pin")
+    return storedPin || this.defaultPin
+  }
+
+  private savePinToStorage(pin: string): void {
+    if (typeof window === "undefined") return
+
+    localStorage.setItem("admin_pin", pin)
+    console.log("✅ PIN이 localStorage에 저장되었습니다:", pin)
+  }
+
+  verifyPin(inputPin: string): boolean {
+    const currentPin = this.getPinFromStorage()
+    console.log("🔍 PIN 검증:", { input: inputPin, stored: currentPin })
+    return currentPin === inputPin
+  }
+
+  changePin(newPin: string): void {
+    console.log("🔄 PIN 변경 시작:", { old: this.getPinFromStorage(), new: newPin })
+
+    this.savePinToStorage(newPin)
+
+    // 변경 확인
+    const verifyNewPin = this.getPinFromStorage()
+    console.log("✅ PIN 변경 완료 및 확인:", verifyNewPin)
+  }
+
+  getCurrentPin(): string {
+    return this.getPinFromStorage()
   }
 
   // 테이블 존재 여부 확인
@@ -365,30 +400,33 @@ class AdminStore {
     }
   }
 
-  // PIN 관리
-  verifyPin(inputPin: string): boolean {
-    return this.pin === inputPin
-  }
-
-  changePin(newPin: string): void {
-    this.pin = newPin
-  }
-
-  // 약관 관리
+  // 약관 관리 (localStorage 사용)
   getPrivacyPolicy(): string {
-    return this.privacyPolicy
+    if (typeof window === "undefined") return this.privacyPolicy
+
+    const stored = localStorage.getItem("privacy_policy")
+    return stored || this.privacyPolicy
   }
 
   updatePrivacyPolicy(policy: string): void {
-    this.privacyPolicy = policy
+    if (typeof window === "undefined") return
+
+    localStorage.setItem("privacy_policy", policy)
+    console.log("✅ 개인정보 약관이 localStorage에 저장되었습니다")
   }
 
   getThirdPartyPolicy(): string {
-    return this.thirdPartyPolicy
+    if (typeof window === "undefined") return this.thirdPartyPolicy
+
+    const stored = localStorage.getItem("third_party_policy")
+    return stored || this.thirdPartyPolicy
   }
 
   updateThirdPartyPolicy(policy: string): void {
-    this.thirdPartyPolicy = policy
+    if (typeof window === "undefined") return
+
+    localStorage.setItem("third_party_policy", policy)
+    console.log("✅ 제3자 제공 약관이 localStorage에 저장되었습니다")
   }
 }
 
