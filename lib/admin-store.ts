@@ -12,7 +12,8 @@ export interface ConsultationStatus {
 
 class AdminStore {
   private static instance: AdminStore
-  private defaultPin = "8673"
+  // 🔐 기본 PIN 변경 (원하는 PIN으로 수정하세요)
+  private defaultPin = "8673" // ← 여기를 원하는 PIN으로 변경
 
   private privacyPolicy = `개인정보 수집 및 이용에 관한 동의
 
@@ -68,6 +69,14 @@ class AdminStore {
 
   getCurrentPin(): string {
     return this.getPinFromStorage()
+  }
+
+  // 🔧 PIN 초기화 함수 (디버깅용)
+  resetPin(): void {
+    if (typeof window === "undefined") return
+
+    localStorage.removeItem("admin_pin")
+    console.log("🔄 PIN이 기본값으로 초기화되었습니다:", this.defaultPin)
   }
 
   // 테이블 존재 여부 확인
