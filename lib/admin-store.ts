@@ -12,7 +12,7 @@ export interface ConsultationStatus {
 
 class AdminStore {
   private static instance: AdminStore
-  private defaultPin = "1234"
+  private defaultPin = "8673"
 
   private privacyPolicy = `개인정보 수집 및 이용에 관한 동의
 
