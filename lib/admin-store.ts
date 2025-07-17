@@ -197,9 +197,23 @@ class AdminStore {
             console.log(`✅ 압축 완료: ${formatFileSize(file.size)} → ${formatFileSize(processedFile.size)}`)
           }
 
-          // 3. Base64로 변환
+          // 3. Base64로 변환 (안전한 처리)
           const fileName = base64StorageHelpers.generateFileName(file.name)
-          const { url: base64Url, path: storagePath } = await base64StorageHelpers.uploadFile(processedFile, fileName)
+          let base64Url: string
+          let storagePath: string
+
+          try {
+            const uploadResult = await base64StorageHelpers.uploadFile(processedFile, fileName)
+            base64Url = uploadResult.url
+            storagePath = uploadResult.path
+
+            // Base64 문자열 유효성 재검증
+            if (!base64Url || !base64Url.startsWith("data:image/")) {
+              throw new Error("Base64 변환 결과가 유효하지 않습니다")
+            }
+          } catch (conversionError: any) {
+            throw new Error(`Base64 변환 실패: ${conversionError.message}`)
+          }
 
           console.log(`📦 Base64 변환 완료: ${file.name}`)
 
@@ -208,7 +222,7 @@ class AdminStore {
             .from("banner_images")
             .insert([
               {
-                url: base64Url, // Base64 문자열
+                url: base64Url, // 검증된 Base64 문자열
                 alt: `배너 이미지 ${currentMaxOrder + index + 1}`,
                 order_index: currentMaxOrder + index + 1,
                 file_name: fileName,

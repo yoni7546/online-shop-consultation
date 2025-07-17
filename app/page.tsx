@@ -201,11 +201,15 @@ export default function OnlineShopConsultation() {
                 <div className="relative bg-white rounded-2xl card-news-shadow overflow-hidden">
                   <div className="aspect-[4/5] relative">
                     <Image
-                      src={banner.url || "/placeholder.svg"}
+                      src={banner.url || "/placeholder.svg?height=675&width=540"}
                       alt={banner.alt}
                       fill
                       className="object-cover"
                       priority={index === 0}
+                      onError={() => {
+                        // 이미지 로드 실패시 placeholder로 대체
+                        console.warn(`이미지 로드 실패: ${banner.url}`)
+                      }}
                     />
 
                     {/* 그라데이션 오버레이 */}

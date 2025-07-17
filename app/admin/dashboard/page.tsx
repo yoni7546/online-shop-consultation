@@ -497,9 +497,13 @@ export default function AdminDashboard() {
                           {previewUrls.map((url, index) => (
                             <div key={index} className="aspect-[4/5] relative">
                               <img
-                                src={url || "/placeholder.svg"}
+                                src={url || "/placeholder.svg?height=270&width=216"}
                                 alt={`미리보기 ${index + 1}`}
                                 className="w-full h-full object-cover rounded border"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement
+                                  target.src = "/placeholder.svg?height=270&width=216"
+                                }}
                               />
                             </div>
                           ))}
@@ -562,9 +566,13 @@ export default function AdminDashboard() {
                             </div>
 
                             <img
-                              src={image.url || "/placeholder.svg"}
+                              src={image.url || "/placeholder.svg?height=120&width=96"}
                               alt={image.alt}
                               className="w-24 h-30 object-cover rounded"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement
+                                target.src = "/placeholder.svg?height=120&width=96"
+                              }}
                             />
 
                             <div className="flex-1">

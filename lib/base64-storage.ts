@@ -2,19 +2,40 @@ import { validateImageFile, formatFileSize } from "./image-utils"
 
 // Base64 이미지 저장 헬퍼 함수들
 export const base64StorageHelpers = {
-  // 🖼️ 파일을 Base64로 변환
+  // 🖼️ 파일을 Base64로 변환 (개선된 버전)
   async convertToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          resolve(reader.result)
-        } else {
-          reject(new Error("Base64 변환 실패"))
+      try {
+        const reader = new FileReader()
+
+        reader.onload = () => {
+          if (typeof reader.result === "string") {
+            // Base64 문자열 유효성 검사
+            const base64String = reader.result
+            if (base64String.startsWith("data:image/")) {
+              resolve(base64String)
+            } else {
+              reject(new Error("유효하지 않은 Base64 형식"))
+            }
+          } else {
+            reject(new Error("Base64 변환 실패"))
+          }
         }
+
+        reader.onerror = () => {
+          reject(new Error(`파일 읽기 실패: ${file.name}`))
+        }
+
+        // 파일 타입 검증
+        if (!file.type.startsWith("image/")) {
+          reject(new Error("이미지 파일이 아닙니다"))
+          return
+        }
+
+        reader.readAsDataURL(file)
+      } catch (error) {
+        reject(new Error(`Base64 변환 중 오류: ${error}`))
       }
-      reader.onerror = () => reject(new Error("파일 읽기 실패"))
-      reader.readAsDataURL(file)
     })
   },
 
