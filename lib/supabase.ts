@@ -23,6 +23,7 @@ export interface CustomerData {
   name: string
   phone: string
   email: string
+  carrier_option: string // 🆕 통신사 옵션 추가
   created_at: string
   privacy_consent: boolean
   marketing_consent: boolean
@@ -143,7 +144,7 @@ export const storageHelpers = {
           .from(STORAGE_BUCKET)
           .upload(fileName, file, { cacheControl: "3600", upsert: false }))
       } catch (uploadEx: any) {
-        // Network-level “Bucket not found” often bubbles as an exception
+        // Network-level "Bucket not found" often bubbles as an exception
         if (uploadEx.message?.includes("bucket") && uploadEx.message?.includes("not found")) {
           throw new Error(
             `Storage 버킷 "${STORAGE_BUCKET}" 을(를) 찾을 수 없습니다.\n\n` +

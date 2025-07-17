@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { MessageCircle, Clock, Settings } from "lucide-react"
 import { adminStore, type ConsultationStatus } from "@/lib/admin-store"
 import type { BannerImage } from "@/lib/supabase"
+import CarrierOptionSelector from "@/components/carrier-option-selector"
 
 export default function OnlineShopConsultation() {
   const [consultations, setConsultations] = useState<ConsultationStatus[]>([
@@ -26,6 +27,7 @@ export default function OnlineShopConsultation() {
     name: "",
     phone: "",
     email: "",
+    carrierOption: "", // 🆕 통신사 옵션 추가
     privacyConsent: false,
     marketingConsent: false,
   })
@@ -126,36 +128,79 @@ export default function OnlineShopConsultation() {
     }))
   }
 
+  // 🆕 통신사 옵션 선택 핸들러 (개선된 버전)
+  const handleCarrierOptionChange = (selectedOption: string) => {
+    console.log("🔄 통신사 옵션 선택:", selectedOption)
+
+    setFormData((prev) => ({
+      ...prev,
+      carrierOption: selectedOption,
+    }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // 🔍 필수 항목 검증 (개선된 버전)
+    const validationErrors: string[] = []
+
+    if (!formData.name.trim()) {
+      validationErrors.push("이름을 입력해주세요.")
+    }
+
+    if (!formData.phone.trim()) {
+      validationErrors.push("휴대폰 번호를 입력해주세요.")
+    }
+
+    if (!formData.carrierOption) {
+      validationErrors.push("통신사 옵션을 선택해주세요.")
+    }
+
     if (!formData.privacyConsent) {
-      alert("개인정보 수집 및 이용에 동의해주세요.")
+      validationErrors.push("개인정보 수집 및 이용에 동의해주세요.")
+    }
+
+    if (validationErrors.length > 0) {
+      alert(`다음 항목을 확인해주세요:\n\n${validationErrors.map((error) => `• ${error}`).join("\n")}`)
       return
     }
 
     setIsSubmitting(true)
 
     try {
+      console.log("📝 상담 신청 데이터:", {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        carrierOption: formData.carrierOption,
+        privacyConsent: formData.privacyConsent,
+        marketingConsent: formData.marketingConsent,
+      })
+
       // 고객 데이터 저장 (Supabase)
       await adminStore.addCustomer({
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
+        carrier_option: formData.carrierOption,
         privacy_consent: formData.privacyConsent,
         marketing_consent: formData.marketingConsent,
       })
 
-      alert("상담 신청이 완료되었습니다. 곧 연락드리겠습니다.")
+      alert(`상담 신청이 완료되었습니다! 🎉\n\n선택하신 옵션: ${formData.carrierOption}\n곧 연락드리겠습니다.`)
+
+      // 폼 초기화
       setFormData({
         name: "",
         phone: "",
         email: "",
+        carrierOption: "",
         privacyConsent: false,
         marketingConsent: false,
       })
     } catch (error) {
-      console.error("Error submitting form:", error)
-      alert("상담 신청 중 오류가 발생했습니다. 다시 시도해주세요.")
+      console.error("❌ 상담 신청 오류:", error)
+      alert("상담 신청 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.")
     } finally {
       setIsSubmitting(false)
     }
@@ -321,6 +366,13 @@ export default function OnlineShopConsultation() {
                     disabled={isSubmitting}
                   />
                 </div>
+
+                {/* 🆕 통신사 옵션 선택 - 안정적인 컴포넌트 버전 */}
+                <CarrierOptionSelector
+                  selectedOption={formData.carrierOption}
+                  onOptionChange={handleCarrierOptionChange}
+                  disabled={isSubmitting}
+                />
 
                 <div className="space-y-4 pt-4 border-t">
                   <div className="flex items-start space-x-3">
