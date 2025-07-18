@@ -18,8 +18,6 @@ interface CarrierOptionSelectorProps {
 const carrierOptions: CarrierOption[] = [
   { id: "kt-device", label: "KT 기기변경", icon: "📱" },
   { id: "kt-number", label: "KT 번호이동", icon: "🔄" },
-  { id: "skt-device", label: "SKT 기기변경", icon: "📱" },
-  { id: "skt-number", label: "SKT 번호이동", icon: "🔄" },
   { id: "no-preference", label: "상관없음", icon: "✨" },
 ]
 
