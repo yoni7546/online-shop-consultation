@@ -70,11 +70,12 @@ export default function AdminDashboard() {
 
   const exportCustomerData = () => {
     const data = [
-      ["이름", "전화번호", "이메일", "통신사옵션", "개인정보동의", "마케팅동의", "신청일시"],
+      ["이름", "전화번호", "이메일", "휴대폰기종", "통신사옵션", "개인정보동의", "마케팅동의", "신청일시"],
       ...customers.map((c) => [
         c.name,
         c.phone,
         c.email,
+        c.phone_option || "미선택",
         c.carrier_option || "미선택",
         c.privacy_consent ? "동의" : "미동의",
         c.marketing_consent ? "동의" : "미동의",
@@ -188,6 +189,10 @@ export default function AdminDashboard() {
                       <p className="font-medium text-lg">{c.name}</p>
                       <p>전화: {c.phone}</p>
                       <p>이메일: {c.email || "미입력"}</p>
+                      <p className="flex items-center gap-1">
+                        <Smartphone className="w-3 h-3" />
+                        휴대폰: {c.phone_option || "미선택"}
+                      </p>
                       <p className="flex items-center gap-1">
                         <Smartphone className="w-3 h-3" />
                         통신사: {c.carrier_option || "미선택"}

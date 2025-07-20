@@ -14,6 +14,7 @@ import { MessageCircle, Clock, Settings } from "lucide-react"
 import { adminStore, type ConsultationStatus } from "@/lib/admin-store"
 import type { BannerImage } from "@/lib/supabase"
 import CarrierOptionSelector from "@/components/carrier-option-selector"
+import PhoneOptionSelector from "@/components/phone-option-selector"
 
 export default function OnlineShopConsultation() {
   const [consultations, setConsultations] = useState<ConsultationStatus[]>([
@@ -27,7 +28,8 @@ export default function OnlineShopConsultation() {
     name: "",
     phone: "",
     email: "",
-    carrierOption: "", // 🆕 통신사 옵션 추가
+    phoneOption: "", // 🆕 휴대폰 기종 옵션 추가
+    carrierOption: "", // 통신사 옵션
     privacyConsent: false,
     marketingConsent: false,
   })
@@ -128,7 +130,17 @@ export default function OnlineShopConsultation() {
     }))
   }
 
-  // 🆕 통신사 옵션 선택 핸들러 (개선된 버전)
+  // 🆕 휴대폰 기종 선택 핸들러
+  const handlePhoneOptionChange = (selectedOption: string) => {
+    console.log("🔄 휴대폰 기종 선택:", selectedOption)
+
+    setFormData((prev) => ({
+      ...prev,
+      phoneOption: selectedOption,
+    }))
+  }
+
+  // 통신사 옵션 선택 핸들러
   const handleCarrierOptionChange = (selectedOption: string) => {
     console.log("🔄 통신사 옵션 선택:", selectedOption)
 
@@ -152,6 +164,10 @@ export default function OnlineShopConsultation() {
       validationErrors.push("휴대폰 번호를 입력해주세요.")
     }
 
+    if (!formData.phoneOption) {
+      validationErrors.push("휴대폰 기종을 선택해주세요.")
+    }
+
     if (!formData.carrierOption) {
       validationErrors.push("통신사 옵션을 선택해주세요.")
     }
@@ -172,6 +188,7 @@ export default function OnlineShopConsultation() {
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
+        phoneOption: formData.phoneOption,
         carrierOption: formData.carrierOption,
         privacyConsent: formData.privacyConsent,
         marketingConsent: formData.marketingConsent,
@@ -182,18 +199,22 @@ export default function OnlineShopConsultation() {
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
+        phone_option: formData.phoneOption,
         carrier_option: formData.carrierOption,
         privacy_consent: formData.privacyConsent,
         marketing_consent: formData.marketingConsent,
       })
 
-      alert(`상담 신청이 완료되었습니다! 🎉\n\n선택하신 옵션: ${formData.carrierOption}\n곧 연락드리겠습니다.`)
+      alert(
+        `상담 신청이 완료되었습니다! 🎉\n\n선택하신 기종: ${formData.phoneOption}\n선택하신 통신사: ${formData.carrierOption}\n곧 연락드리겠습니다.`,
+      )
 
       // 폼 초기화
       setFormData({
         name: "",
         phone: "",
         email: "",
+        phoneOption: "",
         carrierOption: "",
         privacyConsent: false,
         marketingConsent: false,
@@ -367,7 +388,14 @@ export default function OnlineShopConsultation() {
                   />
                 </div>
 
-                {/* 🆕 통신사 옵션 선택 - 안정적인 컴포넌트 버전 */}
+                {/* 🆕 휴대폰 기종 선택 */}
+                <PhoneOptionSelector
+                  selectedOption={formData.phoneOption}
+                  onOptionChange={handlePhoneOptionChange}
+                  disabled={isSubmitting}
+                />
+
+                {/* 통신사 옵션 선택 */}
                 <CarrierOptionSelector
                   selectedOption={formData.carrierOption}
                   onOptionChange={handleCarrierOptionChange}

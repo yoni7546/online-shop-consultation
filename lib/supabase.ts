@@ -23,7 +23,8 @@ export interface CustomerData {
   name: string
   phone: string
   email: string
-  carrier_option: string // 🆕 통신사 옵션 추가
+  phone_option: string // 🆕 휴대폰 기종 옵션 추가
+  carrier_option: string // 통신사 옵션
   created_at: string
   privacy_consent: boolean
   marketing_consent: boolean
